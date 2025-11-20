@@ -1,9 +1,7 @@
-# Interface (Abstração)
 class Observer:
     def update(self, message):
         raise NotImplementedError
 
-# Subject
 class Subject:
     def __init__(self):
         self._observers = []

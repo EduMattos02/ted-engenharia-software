@@ -2,60 +2,160 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Gestão de Tarefas (MVC + SOLID)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Tarefas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .card { border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
-        .HIGH { border-left: 5px solid red; }
-        .MEDIUM { border-left: 5px solid orange; }
-        .LOW { border-left: 5px solid green; }
-        .completed { text-decoration: line-through; color: gray; }
-        .notification { background-color: #e8f4f8; padding: 10px; border: 1px solid #008cba; }
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #f8f9fa;
+            --text-dark: #343a40;
+            --text-light: #6c757d;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,.1);
+            --radius: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #f0f2f5; color: var(--text-dark); line-height: 1.6; padding: 20px; }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        /* Header */
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { font-weight: 700; color: var(--primary-color); margin-bottom: 10px; }
+
+        /* Notificações (Observer) */
+        .notification-area { margin-bottom: 20px; }
+        .notification-card {
+            background-color: #e3f2fd; border-left: 4px solid var(--primary-color);
+            padding: 15px; border-radius: var(--radius); box-shadow: var(--shadow-sm);
+            margin-bottom: 10px; animation: slideIn 0.3s ease-out;
+        }
+        .notification-card strong { display: block; margin-bottom: 5px; color: var(--primary-color); }
+        .notification-card ul { padding-left: 20px; }
+
+        /* Layout Principal (Grid) */
+        .main-content { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        @media (min-width: 768px) { .main-content { grid-template-columns: 1fr 2fr; } }
+
+        /* Seções (Formulário e Lista) */
+        .section-card { background: white; padding: 25px; border-radius: var(--radius); box-shadow: var(--shadow-md); }
+        h3 { font-weight: 600; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--secondary-color); }
+
+        /* Formulário */
+        .task-form input, .task-form select, .task-form button {
+            width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: var(--radius); font-family: inherit;
+        }
+        .task-form input:focus, .task-form select:focus { outline: none; border-color: var(--primary-color); }
+        .task-form button {
+            background-color: var(--primary-color); color: white; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .task-form button:hover { background-color: #004494; }
+
+        /* Lista de Tarefas (Cards) */
+        .task-list { display: grid; gap: 15px; }
+        .task-card {
+            background: white; border-radius: var(--radius); padding: 20px;
+            box-shadow: var(--shadow-sm); border-left: 6px solid #ccc;
+            display: flex; justify-content: space-between; align-items: flex-start;
+            transition: transform 0.2s;
+        }
+        .task-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+        /* Cores de Prioridade */
+        .task-card.HIGH { border-left-color: var(--danger); }
+        .task-card.MEDIUM { border-left-color: var(--warning); }
+        .task-card.LOW { border-left-color: var(--success); }
+
+        .task-info h4 { margin-bottom: 5px; font-size: 1.1rem; }
+        .task-info p { color: var(--text-light); font-size: 0.9rem; }
+        
+        /* Badges de Status */
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+        .status-Pending { background-color: #e2e3e5; color: var(--text-dark); }
+        .status-Completed { background-color: #d4edda; color: var(--success); }
+
+        /* Tarefa Concluída */
+        .task-card.completed-task h4 { text-decoration: line-through; color: var(--text-light); }
+        .task-card.completed-task { opacity: 0.7; border-left-color: var(--secondary-color); }
+
+        /* Botão Concluir */
+        .btn-complete {
+            padding: 8px 12px; background-color: var(--success); color: white;
+            border: none; border-radius: var(--radius); cursor: pointer; font-size: 0.8rem; white-space: nowrap;
+        }
+        .btn-complete:hover { background-color: #218838; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-    <h1>Sistema de Tarefas Colaborativas</h1>
+    <div class="container">
+        <header>
+            <h1>✅ Sistema de Tarefas Colaborativas</h1>
+            <p>Arquitetura MVC + SOLID + Design Patterns</p>
+        </header>
 
-    {% if notifications %}
-    <div class="notification">
-        <strong>🔔 Notificações Recentes:</strong>
-        <ul>
-            {% for note in notifications %}
-                <li>{{ note }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
-
-    <hr>
-
-    <h3>Nova Tarefa</h3>
-    <form action="/add" method="POST">
-        <input type="text" name="title" placeholder="Título" required>
-        <input type="text" name="description" placeholder="Descrição">
-        <select name="type">
-            <option value="routine">Rotina (Baixa)</option>
-            <option value="normal">Normal (Média)</option>
-            <option value="urgent">Urgente (Alta)</option>
-        </select>
-        <button type="submit">Criar Tarefa</button>
-    </form>
-
-    <hr>
-
-    <h3>Suas Tarefas</h3>
-    {% for task in tasks %}
-        <div class="card {{ task.priority }}">
-            <h4 class="{{ 'completed' if task.status == 'Completed' else '' }}">
-                [{{ task.priority }}] {{ task.title }}
-            </h4>
-            <p>{{ task.description }}</p>
-            <p>Status: <strong>{{ task.status }}</strong></p>
-            
-            {% if task.status != 'Completed' %}
-                <a href="/complete/{{ loop.index0 }}"><button>Concluir</button></a>
-            {% endif %}
+        {% if notifications %}
+        <div class="notification-area">
+            <div class="notification-card">
+                <strong>🔔 Notificações Recentes (Observer Pattern):</strong>
+                <ul>
+                    {% for note in notifications %}
+                        <li>{{ note }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-    {% endfor %}
+        {% endif %}
+
+        <main class="main-content">
+            <section class="section-card">
+                <h3>Nova Tarefa (Factory Pattern)</h3>
+                <form action="/add" method="POST" class="task-form">
+                    <input type="text" name="title" placeholder="Título da tarefa..." required autocomplete="off">
+                    <input type="text" name="description" placeholder="Descrição breve..." autocomplete="off">
+                    <select name="type">
+                        <option value="routine">🟢 Rotina (Baixa Prioridade)</option>
+                        <option value="normal" selected>🟡 Normal (Média Prioridade)</option>
+                        <option value="urgent">🔴 Urgente (Alta Prioridade)</option>
+                    </select>
+                    <button type="submit">Criar Tarefa</button>
+                </form>
+            </section>
+
+            <section class="section-card">
+                <h3>Suas Tarefas</h3>
+                <div class="task-list">
+                    {% for task in tasks %}
+                    <div class="task-card {{ task.priority }} {{ 'completed-task' if task.status == 'Completed' else '' }}">
+                        <div class="task-info">
+                            <h4>{{ task.title }}</h4>
+                            <p>{{ task.description }}</p>
+                            <div style="margin-top: 10px;">
+                                <span class="badge status-{{ task.status }}">{{ task.status }}</span>
+                                <small style="color: #999; margin-left: 10px;">Prioridade: {{ task.priority }}</small>
+                            </div>
+                        </div>
+                        
+                        {% if task.status != 'Completed' %}
+                        <div>
+                            <a href="/complete/{{ loop.index0 }}" style="text-decoration: none;">
+                                <button class="btn-complete">✓ Concluir</button>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                        <p style="text-align: center; color: var(--text-light); padding: 20px;">Nenhuma tarefa cadastrada.</p>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+    </div>
 </body>
 </html>

@@ -3,7 +3,6 @@ from app.controllers.task_controller import task_bp
 
 app = Flask(__name__, template_folder='app/templates')
 
-# Registra o controller (Blueprint)
 app.register_blueprint(task_bp)
 
 if __name__ == "__main__":
