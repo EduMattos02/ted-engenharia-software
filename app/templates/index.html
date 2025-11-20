@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Tarefas (MVC + SOLID)</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .card { border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
+        .HIGH { border-left: 5px solid red; }
+        .MEDIUM { border-left: 5px solid orange; }
+        .LOW { border-left: 5px solid green; }
+        .completed { text-decoration: line-through; color: gray; }
+        .notification { background-color: #e8f4f8; padding: 10px; border: 1px solid #008cba; }
+    </style>
+</head>
+<body>
+    <h1>Sistema de Tarefas Colaborativas</h1>
+
+    {% if notifications %}
+    <div class="notification">
+        <strong>🔔 Notificações Recentes:</strong>
+        <ul>
+            {% for note in notifications %}
+                <li>{{ note }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <hr>
+
+    <h3>Nova Tarefa</h3>
+    <form action="/add" method="POST">
+        <input type="text" name="title" placeholder="Título" required>
+        <input type="text" name="description" placeholder="Descrição">
+        <select name="type">
+            <option value="routine">Rotina (Baixa)</option>
+            <option value="normal">Normal (Média)</option>
+            <option value="urgent">Urgente (Alta)</option>
+        </select>
+        <button type="submit">Criar Tarefa</button>
+    </form>
+
+    <hr>
+
+    <h3>Suas Tarefas</h3>
+    {% for task in tasks %}
+        <div class="card {{ task.priority }}">
+            <h4 class="{{ 'completed' if task.status == 'Completed' else '' }}">
+                [{{ task.priority }}] {{ task.title }}
+            </h4>
+            <p>{{ task.description }}</p>
+            <p>Status: <strong>{{ task.status }}</strong></p>
+            
+            {% if task.status != 'Completed' %}
+                <a href="/complete/{{ loop.index0 }}"><button>Concluir</button></a>
+            {% endif %}
+        </div>
+    {% endfor %}
+</body>
+</html>
