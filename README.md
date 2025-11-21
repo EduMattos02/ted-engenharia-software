@@ -1,6 +1,6 @@
 # Sistema de Gestão de Tarefas Colaborativas
 
-Este projeto foi desenvolvido para a disciplina de Engenharia de Software, aplicando arquitetura **MVC**, princípios **SOLID** e Padrões de Projeto (**Design Patterns**).
+Este projeto foi desenvolvido por Eduardo Matos Alves e Luan Ariel Werneck Araújo Aquino para a disciplina de Engenharia de Software, aplicando arquitetura **MVC**, princípios **SOLID** e Padrões de Projeto (**Design Patterns**).
 
 ## 🛠️ Tecnologias Utilizadas
 - **Linguagem:** Python 3.10
